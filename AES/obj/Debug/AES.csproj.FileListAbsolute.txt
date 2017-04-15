@@ -1,0 +1,6 @@
+c:\users\drodriguez\documents\visual studio 2013\Projects\AES\AES\bin\Debug\AES.exe.config
+C:\celular2\eta\AES\AES\bin\Debug\AES.exe.config
+C:\celular2\eta\AES\AES\obj\Debug\AES.csprojResolveAssemblyReference.cache
+C:\celular2\eta\AES\AES\obj\Debug\AES.Form1.resources
+C:\celular2\eta\AES\AES\obj\Debug\AES.Properties.Resources.resources
+C:\celular2\eta\AES\AES\obj\Debug\AES.csproj.GenerateResource.Cache
