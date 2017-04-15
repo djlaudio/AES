@@ -4,3 +4,4 @@ C:\celular2\eta\AES\AES\obj\Debug\AES.csprojResolveAssemblyReference.cache
 C:\celular2\eta\AES\AES\obj\Debug\AES.Form1.resources
 C:\celular2\eta\AES\AES\obj\Debug\AES.Properties.Resources.resources
 C:\celular2\eta\AES\AES\obj\Debug\AES.csproj.GenerateResource.Cache
+C:\Users\drodriguez\Documents\GitHub\AES\AES\bin\Debug\AES.exe.config
