@@ -385,7 +385,7 @@ namespace AES
         for (i = 0; i < inn.Length + lenght; i++) {
              if (i > 0 && i % 16 == 0) {
                  bloc = encryptBloc(bloc);
-                 System.arraycopy(bloc, 0, tmp, i - 16, bloc.Length);
+                 System.array.copy(bloc, 0, tmp, i - 16, bloc.Length);
                 
              }
              if (i < inn.Length)
