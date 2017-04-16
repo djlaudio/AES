@@ -10,7 +10,7 @@ namespace AES
     {
 
          private static int Nb, Nk, Nr;
-         private static byte[][] w; //memorizza le subKeys
+         private static byte[,] w; //memorizza le subKeys
  
 /*
  * La S-box utilizzata è derivata da una funzione inversa nel campo finito GF(2^8),
@@ -104,17 +104,18 @@ namespace AES
  
 }
  // Genero le varie subkeys di ogni round.
- private static byte[][] generateSubkeys(byte[] key) {
+ private static byte[,] generateSubkeys(byte[] key) {
                  
-                 byte[][] tmp = new byte[Nb * (Nr + 1)][4];
+                 byte[,] tmp = new byte[Nb * (Nr + 1), 4];
+    
  
                  int i = 0;
                  while (i < Nk) {
  
-                     tmp[i][0] = key[i * 4];
-                     tmp[i][1] = key[i * 4 + 1];
-                     tmp[i][2] = key[i * 4 + 2];
-                     tmp[i][3] = key[i * 4 + 3];
+                     tmp[i, 0] = key[i * 4];
+                     tmp[i, 1] = key[i * 4 + 1];
+                     tmp[i, 2] = key[i * 4 + 2];
+                     tmp[i, 3] = key[i * 4 + 3];
                      i++;
                  }
                  i = Nk;
@@ -122,14 +123,14 @@ namespace AES
                  while (i < Nb * (Nr + 1)) {
                      byte[] temp = new byte[4];
                      for(int k = 0;k<4;k++)
-                        temp[k] = tmp[i-1][k];
+                        temp[k] = tmp[i-1, k];
                      if (i % Nk == 0) {
                          temp = SubWord(rotateWord(temp)); //effettua lo xor con Rcon
                          temp[0] = (byte) (temp[0] ^ (Rcon[i / Nk] & 0xff));
                      } else if (Nk > 6 && i % Nk == 4) {
                         temp = SubWord(temp);
                      }
-
+                     //ver
                      tmp[i] = xor_func(tmp[i - Nk], temp);
                      i++;
                  }
@@ -168,9 +169,9 @@ namespace AES
  * ad ogni round, attraverso il gestore delle chiavi.
  * Un AddRoundKey viene eseguito all'inizio di tutto.
  */
- private static byte[][] AddRoundKey(byte[][] state, byte[][] w, int round) {
+ private static byte[,] AddRoundKey(byte[,] state, byte[,] w, int round) {
  
-            byte[][] tmp = new byte[state.Length][state[0].Length];
+            byte[,] tmp = new byte[state.Length, state[0].Length];
  
             for (int c = 0; c < Nb; c++) {
              for (int l = 0; l < 4; l++)
@@ -187,12 +188,12 @@ namespace AES
  * conosciuta per avere delle ottime proprietà di non linearità.
  *
  */
- private static byte[][] SubBytes(byte[][] state) {
+ private static byte[,] SubBytes(byte[,] state) {
  
-             byte[][] tmp = new byte[state.Length][state[0].length];
+             byte[,] tmp = new byte[state.Length, state[0].Length];
              for (int row = 0; row < 4; row++)
              for (int col = 0; col < Nb; col++)
-             tmp[row][col] = (byte) (sbox[(state[row][col] & 0x000000ff)] & 0xff);
+             tmp[row, col] = (byte) (sbox[(state[row, col] & 0x000000ff)] & 0xff);
  
              return tmp;
  }
@@ -201,11 +202,11 @@ namespace AES
  * Nel passaggio SubBytes ogni byte della matrice viene modificato tramite la S-box a 8 bit.
  * Effettua il passaggio contrario a SubBytes, ricavando gli states dalla matrice inversa.
  */
- private static byte[][] InvSubBytes(byte[][] state) {
+ private static byte[,] InvSubBytes(byte[,] state) {
 
              for (int row = 0; row < 4; row++)
              for (int col = 0; col < Nb; col++)
-             state[row][col] = (byte)(inv_sbox[(state[row][col] & 0x000000ff)]&0xff);
+             state[row, col] = (byte)(inv_sbox[(state[row, col] & 0x000000ff)]&0xff);
  
              return state;
  }
@@ -218,12 +219,12 @@ namespace AES
  * Tutte le operazioni sono effettuate utilizzando l'indice della colonna “modulo”
  * il numero di colonne.
  */
- private static byte[][] ShiftRows(byte[][] state) {
+ private static byte[,] ShiftRows(byte[,] state) {
  
                  byte[] t = new byte[4];
                  for (int r = 1; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
-                        t = state[r][((c + r) % Nb)];
+                        t = state[r, ((c + r) % Nb)];
                      for (int c = 0; c < Nb; c++)
                         state[r] = t;
                  }
@@ -234,7 +235,7 @@ namespace AES
  /*
  * Il passaggio contrario a ShiftRows per il decrypt.
  */
- private static byte[][] InvShiftRows(byte[][] state) {
+ private static byte[,] InvShiftRows(byte[,] state) {
                  byte[] t = new byte[4];
                  for (int r = 1; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
@@ -246,7 +247,7 @@ namespace AES
  }
  
 //Il contrario di MixColumns, serve per decriptare.
- private static byte[][] InvMixColumns(byte[][] s){
+ private static byte[,] InvMixColumns(byte[,] s){
              int[] sp = new int[4];
              byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
              for (int c = 0; c < 4; c++) {
@@ -267,7 +268,7 @@ namespace AES
  * Nel passaggio MixColumns ogni colonna di byte viene moltiplicata
  * per un polinomio fisso c(x).
  */
- private static byte[][] MixColumns(byte[][] s){
+ private static byte[,] MixColumns(byte[,] s){
                  int[] sp = new int[4];
                  byte b02 = (byte)0x02, b03 = (byte)0x03;
 
@@ -302,10 +303,10 @@ namespace AES
  public static byte[] encryptBloc(byte[] inn) {
              byte[] tmp = new byte[inn.Length];
  
-            byte[][] state = new byte[4][Nb];
+            byte[,] state = new byte[4,Nb];
  
             for (int i = 0; i < inn.Length; i++)
-                state[i / 4][i % 4] = inn[i%4*4+i/4];
+                state[i / 4, i % 4] = inn[i%4*4+i/4];
  
             state = AddRoundKey(state, w, 0);
              for (int round = 1; round < Nr; round++) {
@@ -320,7 +321,7 @@ namespace AES
              state = AddRoundKey(state, w, Nr);
  
             for (int i = 0; i < tmp.Length; i++)
-                tmp[i%4*4+i/4] = state[i / 4][i%4];
+                tmp[i%4*4+i/4] = state[i / 4, i%4];
  
             return tmp;
  }
@@ -330,10 +331,10 @@ namespace AES
 
                 byte[] tmp = new byte[inn.Length];
  
-                byte[][] state = new byte[4][Nb];
+                byte[,] state = new byte[4, Nb];
  
                 for (int i = 0; i < inn.Length; i++)
-                 state[i / 4][i % 4] = inn[i%4*4+i/4];
+                 state[i / 4, i % 4] = inn[i%4*4+i/4];
  
                 state = AddRoundKey(state, w, Nr);
                  for (int round = Nr-1; round >=1; round--) {
@@ -349,7 +350,7 @@ namespace AES
                  state = AddRoundKey(state, w, 0);
  
                 for (int i = 0; i < tmp.Length; i++)
-                    tmp[i%4*4+i/4] = state[i / 4][i%4];
+                    tmp[i%4*4+i/4] = state[i / 4, i%4];
  
                 return tmp;
  }
@@ -385,7 +386,7 @@ namespace AES
         for (i = 0; i < inn.Length + lenght; i++) {
              if (i > 0 && i % 16 == 0) {
                  bloc = encryptBloc(bloc);
-                 System.arraycopy(bloc, 0, tmp, i - 16, bloc.Length);
+                 System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
                 
              }
              if (i < inn.Length)
@@ -397,7 +398,7 @@ namespace AES
          }
          if(bloc.Length == 16){
              bloc = encryptBloc(bloc);
-             System.arraycopy(bloc, 0, tmp, i - 16, bloc.Length);
+             System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
          }
  
          return tmp;
@@ -419,14 +420,14 @@ namespace AES
              for (i = 0; i < inn.Length; i++) {
                  if (i > 0 && i % 16 == 0) {
                      bloc = decryptBloc(bloc);
-                     System.arraycopy(bloc, 0, tmp, i - 16, bloc.Length);
+                     System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
                  }
                  if (i < inn.Length)
                     bloc[i % 16] = inn[i];
              }
 
              bloc = decryptBloc(bloc);
-             System.arraycopy(bloc, 0, tmp, i - 16, bloc.Length);
+             System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
              tmp = deletePadding(tmp);
  
             return tmp;
@@ -448,7 +449,7 @@ namespace AES
              }
  
              byte[] tmp = new byte[input.Length - count - 1];
-             System.arraycopy(input, 0, tmp, 0, tmp.Length);
+             System.Array.Copy(input, 0, tmp, 0, tmp.Length);
              return tmp;
  }
 
