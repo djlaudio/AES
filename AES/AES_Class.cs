@@ -386,7 +386,11 @@ namespace AES
         for (i = 0; i < inn.Length + lenght; i++) {
              if (i > 0 && i % 16 == 0) {
                  bloc = encryptBloc(bloc);
+<<<<<<< HEAD
                  System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+=======
+                 Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+>>>>>>> origin/Arreglos-de-JAVA
                 
              }
              if (i < inn.Length)
@@ -398,7 +402,11 @@ namespace AES
          }
          if(bloc.Length == 16){
              bloc = encryptBloc(bloc);
+<<<<<<< HEAD
              System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+=======
+             Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+>>>>>>> origin/Arreglos-de-JAVA
          }
  
          return tmp;
@@ -420,14 +428,22 @@ namespace AES
              for (i = 0; i < inn.Length; i++) {
                  if (i > 0 && i % 16 == 0) {
                      bloc = decryptBloc(bloc);
+<<<<<<< HEAD
                      System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+=======
+                     Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+>>>>>>> origin/Arreglos-de-JAVA
                  }
                  if (i < inn.Length)
                     bloc[i % 16] = inn[i];
              }
 
              bloc = decryptBloc(bloc);
+<<<<<<< HEAD
              System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+=======
+             Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
+>>>>>>> origin/Arreglos-de-JAVA
              tmp = deletePadding(tmp);
  
             return tmp;
@@ -449,7 +465,11 @@ namespace AES
              }
  
              byte[] tmp = new byte[input.Length - count - 1];
+<<<<<<< HEAD
              System.Array.Copy(input, 0, tmp, 0, tmp.Length);
+=======
+             Array.Copy(input, 0, tmp, 0, tmp.Length);
+>>>>>>> origin/Arreglos-de-JAVA
              return tmp;
  }
 
