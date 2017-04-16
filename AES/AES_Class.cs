@@ -130,7 +130,7 @@ namespace AES
                      } else if (Nk > 6 && i % Nk == 4) {
                         temp = SubWord(temp);
                      }
-                     //ver
+                     //verg
                      tmp[i] = xor_func(tmp[i - Nk], temp);
                      i++;
                  }
