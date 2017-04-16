@@ -138,14 +138,6 @@ namespace AES
                      tmp[i, 2] = (byte)((int)tmp[i - Nk, 2] ^ (int)temp[2]);
                      tmp[i, 3] = (byte)((int)tmp[i - Nk, 3] ^ (int)temp[3]); 
 
-                    // resultado = xor_func((byte[])tmp.GetValue(i - Nk), temp);
-
-                     //meter for
-                     //tmp.SetValue(xor_func((byte[])tmp.GetValue(i - Nk), temp), i);
-                     
-                     //tmp[i,0] = 3;
-                     //tmp.SetValue(xor_func((byte[]) tmp.GetValue(i - Nk), temp), i);
-                     
                      i++;
                  }
  
