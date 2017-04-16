@@ -27,7 +27,8 @@ namespace AES
                 String key = "1234567890ABCDEF";
 
                 byte[] Cifrado = AES_Class.encrypt(Encoding.ASCII.GetBytes(textoClaro), Encoding.ASCII.GetBytes(key));
-                MessageBox.Show("Este es el cifrado: " + Convert.ToString(Cifrado));
+                //MessageBox.Show("Este es el cifrado: " + Convert.ToString(Cifrado));
+                rtGenerico.Text = System.Text.Encoding.Default.GetString(Cifrado);
 
             }
             catch (Exception ex)

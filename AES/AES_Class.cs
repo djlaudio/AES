@@ -138,14 +138,6 @@ namespace AES
                      tmp[i, 2] = (byte)((int)tmp[i - Nk, 2] ^ (int)temp[2]);
                      tmp[i, 3] = (byte)((int)tmp[i - Nk, 3] ^ (int)temp[3]); 
 
-                    // resultado = xor_func((byte[])tmp.GetValue(i - Nk), temp);
-
-                     //meter for
-                     //tmp.SetValue(xor_func((byte[])tmp.GetValue(i - Nk), temp), i);
-                     
-                     //tmp[i,0] = 3;
-                     //tmp.SetValue(xor_func((byte[]) tmp.GetValue(i - Nk), temp), i);
-                     
                      i++;
                  }
  
@@ -185,14 +177,16 @@ namespace AES
  */
  private static byte[,] AddRoundKey(byte[,] state, byte[,] w, int round) {
  
-            byte[,] tmp = new byte[state.Length, state.GetLength(0)];
+            //byte[,] tmp = new byte[state.Length, state.GetLength(0)];
  
             for (int c = 0; c < Nb; c++) {
                 for (int l = 0; l < 4; l++)
-                    tmp.SetValue((byte)((byte) state.GetValue(l) ^ w[round * Nb + c, l]), l);
+                    //tmp.SetValue((byte)((byte) state.GetValue(l) ^ w[round * Nb + c, l]), l);
+                    //tmp[c,l] = (byte) ((int)state[c,l] ^ (int) w[round * Nb + l, c]);
+                     state[c, l] = (byte)((int)state[c, l] ^ (int)w[round * Nb + l, c]); 
              }
  
-            return tmp;
+            return state;
  }
  
 /*
@@ -204,12 +198,14 @@ namespace AES
  */
  private static byte[,] SubBytes(byte[,] state) {
  
-             byte[,] tmp = new byte[state.Length, state.GetLength(0)];
+             //byte[,] tmp = new byte[state.Length, state.GetLength(0)];
+
              for (int row = 0; row < 4; row++)
-             for (int col = 0; col < Nb; col++)
-             tmp[row, col] = (byte) (sbox[(state[row, col] & 0x000000ff)] & 0xff);
+                 for (int col = 0; col < Nb; col++)
+                    //tmp[row, col] = (byte) (sbox[(state[row, col] & 0x000000ff)] & 0xff);
+                     state[row, col] = (byte)(sbox[(state[row, col] & 0x000000ff)] & 0xff);
  
-             return tmp;
+             return state;
  }
  
  /*
@@ -235,14 +231,16 @@ namespace AES
  */
  private static byte[,] ShiftRows(byte[,] state) {
  
-                 byte[] t = new byte[4];
-                 for (int r = 1; r < 4; r++) {
+                 byte[,] temp = new byte[4,4];
+                 for (int r = 0; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
                          //se añade sub c
-                        t[c] = state[r, ((c + r) % Nb)];
+                        temp[r, c] = state[r, c];
+                 }
+                 for (int r = 1; r < 4; r++)
+                 {
                      for (int c = 0; c < Nb; c++)
-                         //state state[r] = t;
-                         state.SetValue(t, r);
+                         state[r, c] = temp[r, ((c + r) % Nb)];
                  }
  
                 return state;
@@ -286,19 +284,27 @@ namespace AES
  * per un polinomio fisso c(x).
  */
  private static byte[,] MixColumns(byte[,] s){
-                 int[] sp = new int[4];
+
+                 byte[,] temp = new byte[4, 4];
                  byte b02 = (byte)0x02, b03 = (byte)0x03;
 
-                 for (int c = 0; c < 4; c++) {
-                     sp[0] = FFMul(b02, (byte)s.GetValue(0)) ^ FFMul(b03, (byte)s.GetValue(1)) ^ (byte)s.GetValue(2) ^ (byte) s.GetValue(3);
-                     sp[1] = (byte)s.GetValue(0) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ (byte) s.GetValue(3);
-                     sp[2] = (byte)s.GetValue(0) ^ (byte)s.GetValue(1) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
-                     sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ (byte)s.GetValue(1) ^ (byte)s.GetValue(2) ^ FFMul(b02, (byte) s.GetValue(3));
-                 for (int i = 0; i < 4; i++) 
-                     //s[i] = (byte)(sp[i]);
-                     s.SetValue((byte)(sp[i]), i);
+                 for (int r = 0; r < 4; r++)
+                 {
+                     for (int c = 0; c < 4; c++)
+                     {
+                         temp[r, c] = s[r, c];
+                     }
                  }
- 
+
+                 for (int c = 0; c < 4; c++)
+                 {
+                     s[0, c] = (byte) (FFMul(b02, temp[0, c]) ^ FFMul(b03, temp[1, c]) ^ temp[2, c] ^ temp[3, c]);
+                     s[1, c] = (byte) (temp[0, c] ^ FFMul(b02, temp[1, c]) ^ FFMul(b03, temp[2, c]) ^ temp[3, c]);
+                     s[2, c] = (byte) (temp[0, c] ^ temp[1, c] ^ FFMul(b02, temp[2, c]) ^ FFMul(b03, temp[3, c]));
+                     s[3, c] = (byte) (FFMul(b03, temp[0, c]) ^ temp[1, c] ^ temp[2, c] ^ FFMul(b02, temp[3, c]));
+
+                 }
+                 //sp.CopyTo(s, 0);
                  return s;
  }
  //Con questa funzione i byte "a" e "b" si moltiplicano lentamente utilizzando gli shift
