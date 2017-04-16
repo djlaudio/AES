@@ -130,8 +130,10 @@ namespace AES
                      } else if (Nk > 6 && i % Nk == 4) {
                         temp = SubWord(temp);
                      }
-                     //verg
-                     tmp[i] = xor_func(tmp[i - Nk], temp);
+                     //añadir indice 0 temp para probar
+                     // tmp[i] = xor_func(tmp[i - Nk], temp);
+                     tmp.SetValue(xor_func((byte[]) tmp.GetValue(i - Nk), temp), i);
+                     
                      i++;
                  }
  
@@ -171,11 +173,11 @@ namespace AES
  */
  private static byte[,] AddRoundKey(byte[,] state, byte[,] w, int round) {
  
-            byte[,] tmp = new byte[state.Length, state[0].Length];
+            byte[,] tmp = new byte[state.Length, state.GetLength(0)];
  
             for (int c = 0; c < Nb; c++) {
-             for (int l = 0; l < 4; l++)
-             tmp[l] = (byte) (state[l] ^ w[round * Nb + c][l]);
+                for (int l = 0; l < 4; l++)
+                    tmp.SetValue((byte)((byte) state.GetValue(l) ^ w[round * Nb + c, l]), l);
              }
  
             return tmp;
@@ -190,7 +192,7 @@ namespace AES
  */
  private static byte[,] SubBytes(byte[,] state) {
  
-             byte[,] tmp = new byte[state.Length, state[0].Length];
+             byte[,] tmp = new byte[state.Length, state.GetLength(0)];
              for (int row = 0; row < 4; row++)
              for (int col = 0; col < Nb; col++)
              tmp[row, col] = (byte) (sbox[(state[row, col] & 0x000000ff)] & 0xff);
@@ -224,9 +226,11 @@ namespace AES
                  byte[] t = new byte[4];
                  for (int r = 1; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
-                        t = state[r, ((c + r) % Nb)];
+                         //se añade sub c
+                        t[c] = state[r, ((c + r) % Nb)];
                      for (int c = 0; c < Nb; c++)
-                        state[r] = t;
+                         //state state[r] = t;
+                         state.SetValue(t, r);
                  }
  
                 return state;
@@ -239,9 +243,10 @@ namespace AES
                  byte[] t = new byte[4];
                  for (int r = 1; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
-                        t[(c + r)%Nb] = state[r];
+                        t[(c + r)%Nb] = (byte) state.GetValue(r);
                      for (int c = 0; c < Nb; c++)
-                        state[r] = t;
+                         //state[r] = t;
+                         state.SetValue(t, r);
                  }
                  return state;
  }
@@ -251,14 +256,14 @@ namespace AES
              int[] sp = new int[4];
              byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
              for (int c = 0; c < 4; c++) {
-                 sp[0] = FFMul(b02, s[0]) ^ FFMul(b03, s[1]) ^ FFMul(b04,s[2]) ^ FFMul(b05,s[3]);
-                 sp[1] = FFMul(b05, s[0]) ^ FFMul(b02, s[1]) ^ FFMul(b03,s[2]) ^ FFMul(b04,s[3]);
-                 sp[2] = FFMul(b04, s[0]) ^ FFMul(b05, s[1]) ^ FFMul(b02,s[2]) ^ FFMul(b03,s[3]);
-                 sp[3] = FFMul(b03, s[0]) ^ FFMul(b04, s[1]) ^ FFMul(b05,s[2]) ^ FFMul(b02,s[3]);
+                 sp[0] = FFMul(b02, (byte) s.GetValue(0)) ^ FFMul(b03, (byte) s.GetValue(1)) ^ FFMul(b04, (byte) s.GetValue(2)) ^ FFMul(b05, (byte) s.GetValue(3));
+                 sp[1] = FFMul(b05, (byte)s.GetValue(0)) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ FFMul(b04, (byte) s.GetValue(3));
+                 sp[2] = FFMul(b04, (byte)s.GetValue(0)) ^ FFMul(b05, (byte)s.GetValue(1)) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
+                 sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ FFMul(b04, (byte)s.GetValue(1)) ^ FFMul(b05, (byte)s.GetValue(2)) ^ FFMul(b02, (byte) s.GetValue(3));
                  for (int i = 0; i < 4; i++) 
-                     s[i] = (byte)(sp[i]);
+                     s.SetValue((byte)(sp[i]), i);
              }
- 
+             
              return s;
  }
  
@@ -273,12 +278,13 @@ namespace AES
                  byte b02 = (byte)0x02, b03 = (byte)0x03;
 
                  for (int c = 0; c < 4; c++) {
-                    sp[0] = FFMul(b02, s[0]) ^ FFMul(b03, s[1]) ^ s[2] ^ s[3];
-                    sp[1] = s[0] ^ FFMul(b02, s[1]) ^ FFMul(b03, s[2]) ^ s[3];
-                    sp[2] = s[0] ^ s[1] ^ FFMul(b02, s[2]) ^ FFMul(b03, s[3]);
-                    sp[3] = FFMul(b03, s[0]) ^ s[1] ^ s[2] ^ FFMul(b02, s[3]);
+                     sp[0] = FFMul(b02, (byte)s.GetValue(0)) ^ FFMul(b03, (byte)s.GetValue(1)) ^ (byte)s.GetValue(2) ^ (byte) s.GetValue(3);
+                     sp[1] = (byte)s.GetValue(0) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ (byte) s.GetValue(3);
+                     sp[2] = (byte)s.GetValue(0) ^ (byte)s.GetValue(1) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
+                     sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ (byte)s.GetValue(1) ^ (byte)s.GetValue(2) ^ FFMul(b02, (byte) s.GetValue(3));
                  for (int i = 0; i < 4; i++) 
-                     s[i] = (byte)(sp[i]);
+                     //s[i] = (byte)(sp[i]);
+                     s.SetValue((byte)(sp[i]), i);
                  }
  
                  return s;
@@ -288,13 +294,13 @@ namespace AES
  public static byte FFMul(byte a, byte b) {
              byte aa = a, bb = b, r = 0, t;
              while (aa != 0) {
-             if ((aa & 1) != 0)
-             r = (byte) (r ^ bb);
-             t = (byte) (bb & 0x80);
-             bb = (byte) (bb << 1);
-             if (t != 0)
-             bb = (byte) (bb ^ 0x1b);
-             aa = (byte) ((aa & 0xff) >> 1);
+                 if ((aa & 1) != 0)
+                    r = (byte) (r ^ bb);
+                    t = (byte) (bb & 0x80);
+                    bb = (byte) (bb << 1);
+                 if (t != 0)
+                    bb = (byte) (bb ^ 0x1b);
+                    aa = (byte) ((aa & 0xff) >> 1);
              }
              return r;
  }
@@ -386,11 +392,8 @@ namespace AES
         for (i = 0; i < inn.Length + lenght; i++) {
              if (i > 0 && i % 16 == 0) {
                  bloc = encryptBloc(bloc);
-<<<<<<< HEAD
+            
                  System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-=======
-                 Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
->>>>>>> origin/Arreglos-de-JAVA
                 
              }
              if (i < inn.Length)
@@ -402,11 +405,7 @@ namespace AES
          }
          if(bloc.Length == 16){
              bloc = encryptBloc(bloc);
-<<<<<<< HEAD
              System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-=======
-             Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
->>>>>>> origin/Arreglos-de-JAVA
          }
  
          return tmp;
@@ -428,22 +427,14 @@ namespace AES
              for (i = 0; i < inn.Length; i++) {
                  if (i > 0 && i % 16 == 0) {
                      bloc = decryptBloc(bloc);
-<<<<<<< HEAD
                      System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-=======
-                     Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
->>>>>>> origin/Arreglos-de-JAVA
                  }
                  if (i < inn.Length)
                     bloc[i % 16] = inn[i];
              }
 
              bloc = decryptBloc(bloc);
-<<<<<<< HEAD
              System.Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-=======
-             Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
->>>>>>> origin/Arreglos-de-JAVA
              tmp = deletePadding(tmp);
  
             return tmp;
@@ -465,11 +456,7 @@ namespace AES
              }
  
              byte[] tmp = new byte[input.Length - count - 1];
-<<<<<<< HEAD
              System.Array.Copy(input, 0, tmp, 0, tmp.Length);
-=======
-             Array.Copy(input, 0, tmp, 0, tmp.Length);
->>>>>>> origin/Arreglos-de-JAVA
              return tmp;
  }
 
