@@ -28,8 +28,10 @@ namespace AES
 
                 byte[] Cifrado = AES_Class.encrypt(Encoding.ASCII.GetBytes(textoClaro), Encoding.ASCII.GetBytes(key));
                 //MessageBox.Show("Este es el cifrado: " + Convert.ToString(Cifrado));
-                rtGenerico.Text = System.Text.Encoding.Default.GetString(Cifrado);
+                //rtGenerico.Text = System.Text.Encoding.Default.GetString(Cifrado);
 
+                byte[] Respuesta = AES_Class.decrypt(Cifrado, Encoding.ASCII.GetBytes(key));
+                rtGenerico.Text = System.Text.Encoding.Default.GetString(Respuesta);
             }
             catch (Exception ex)
             {

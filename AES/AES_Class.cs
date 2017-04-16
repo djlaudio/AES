@@ -215,8 +215,8 @@ namespace AES
  private static byte[,] InvSubBytes(byte[,] state) {
 
              for (int row = 0; row < 4; row++)
-             for (int col = 0; col < Nb; col++)
-             state[row, col] = (byte)(inv_sbox[(state[row, col] & 0x000000ff)]&0xff);
+                for (int col = 0; col < Nb; col++)
+                    state[row, col] = (byte)(inv_sbox[(state[row, col] & 0x000000ff)]&0xff);
  
              return state;
  }
@@ -250,30 +250,55 @@ namespace AES
  * Il passaggio contrario a ShiftRows per il decrypt.
  */
  private static byte[,] InvShiftRows(byte[,] state) {
-                 byte[] t = new byte[4];
-                 for (int r = 1; r < 4; r++) {
+                 byte[,] temp = new byte[4,4];
+
+                 for (int r = 0; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
-                        t[(c + r)%Nb] = (byte) state.GetValue(r);
+                         temp[r, c] = state[r, c];
+                 }
+                 for (int r = 1; r < 4; r++)
+                 {
                      for (int c = 0; c < Nb; c++)
-                         //state[r] = t;
-                         state.SetValue(t, r);
+                         state[r, (c + r) % Nb] = temp[r, c];
                  }
                  return state;
  }
  
 //Il contrario di MixColumns, serve per decriptare.
  private static byte[,] InvMixColumns(byte[,] s){
-             int[] sp = new int[4];
-             byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
-             for (int c = 0; c < 4; c++) {
-                 sp[0] = FFMul(b02, (byte) s.GetValue(0)) ^ FFMul(b03, (byte) s.GetValue(1)) ^ FFMul(b04, (byte) s.GetValue(2)) ^ FFMul(b05, (byte) s.GetValue(3));
-                 sp[1] = FFMul(b05, (byte)s.GetValue(0)) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ FFMul(b04, (byte) s.GetValue(3));
-                 sp[2] = FFMul(b04, (byte)s.GetValue(0)) ^ FFMul(b05, (byte)s.GetValue(1)) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
-                 sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ FFMul(b04, (byte)s.GetValue(1)) ^ FFMul(b05, (byte)s.GetValue(2)) ^ FFMul(b02, (byte) s.GetValue(3));
-                 for (int i = 0; i < 4; i++) 
-                     s.SetValue((byte)(sp[i]), i);
-             }
+             //int[] sp = new int[4];
+             //byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
+             //for (int c = 0; c < 4; c++) {
+             //    sp[0] = FFMul(b02, (byte) s.GetValue(0)) ^ FFMul(b03, (byte) s.GetValue(1)) ^ FFMul(b04, (byte) s.GetValue(2)) ^ FFMul(b05, (byte) s.GetValue(3));
+             //    sp[1] = FFMul(b05, (byte)s.GetValue(0)) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ FFMul(b04, (byte) s.GetValue(3));
+             //    sp[2] = FFMul(b04, (byte)s.GetValue(0)) ^ FFMul(b05, (byte)s.GetValue(1)) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
+             //    sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ FFMul(b04, (byte)s.GetValue(1)) ^ FFMul(b05, (byte)s.GetValue(2)) ^ FFMul(b02, (byte) s.GetValue(3));
+             //    for (int i = 0; i < 4; i++) 
+             //        s.SetValue((byte)(sp[i]), i);
+             //}
              
+             //return s;
+             byte[,] temp = new byte[4, 4];
+             byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
+
+             for (int r = 0; r < 4; r++)
+             {
+                 for (int c = 0; c < 4; c++)
+                 {
+                    temp[r,c] = s[r, c];
+                 }
+             }
+
+             for (int c = 0; c < 4; c++)
+             {
+                 s[0, c] = (byte)(FFMul(b02, temp[0, c]) ^ FFMul(b03, temp[1, c]) ^ FFMul(b04, temp[2, c]) ^ FFMul(b05, temp[3, c]));
+                 s[1, c] = (byte)(FFMul(b05, temp[0, c]) ^ FFMul(b02, temp[1, c]) ^ FFMul(b03, temp[2, c]) ^ FFMul(b04, temp[3, c]));
+                 s[2, c] = (byte)(FFMul(b04, temp[0, c]) ^ FFMul(b05, temp[1, c]) ^ FFMul(b02, temp[2, c]) ^ FFMul(b03, temp[3, c]));
+                 s[3, c] = (byte)(FFMul(b03, temp[0, c]) ^ FFMul(b04, temp[1, c]) ^ FFMul(b05, temp[2, c]) ^ FFMul(b02, temp[3, c]));
+
+             }
+
+             //sp.CopyTo(s, 0);
              return s;
  }
  
