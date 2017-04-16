@@ -131,8 +131,20 @@ namespace AES
                         temp = SubWord(temp);
                      }
                      //añadir indice 0 temp para probar
-                     // tmp[i] = xor_func(tmp[i - Nk], temp);
-                     tmp.SetValue(xor_func((byte[]) tmp.GetValue(i - Nk), temp), i);
+                     //tmp[i] = xor_func(tmp[i - Nk], temp);
+
+                     tmp[i, 0] = (byte)((int)tmp[i - Nk, 0] ^ (int)temp[0]);
+                     tmp[i, 1] = (byte)((int)tmp[i - Nk, 1] ^ (int)temp[1]);
+                     tmp[i, 2] = (byte)((int)tmp[i - Nk, 2] ^ (int)temp[2]);
+                     tmp[i, 3] = (byte)((int)tmp[i - Nk, 3] ^ (int)temp[3]); 
+
+                    // resultado = xor_func((byte[])tmp.GetValue(i - Nk), temp);
+
+                     //meter for
+                     //tmp.SetValue(xor_func((byte[])tmp.GetValue(i - Nk), temp), i);
+                     
+                     //tmp[i,0] = 3;
+                     //tmp.SetValue(xor_func((byte[]) tmp.GetValue(i - Nk), temp), i);
                      
                      i++;
                  }
