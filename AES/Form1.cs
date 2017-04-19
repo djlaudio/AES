@@ -23,15 +23,17 @@ namespace AES
             try
             {
 
-                String textoClaro = "Douglas Rodriguez Valverde";
-                String key = "1234567890ABCDEF";
+                String textoClaro = rtUp.Text;
+                String key = tbKey.Text;
+                //16 caracteres >> 128bits
+                //24 caracteres >> 192bits
+                //32 caracteres >> 256bits
+                //Faltan hacer combo
 
                 byte[] Cifrado = AES_Class.encrypt(Encoding.ASCII.GetBytes(textoClaro), Encoding.ASCII.GetBytes(key));
-                //MessageBox.Show("Este es el cifrado: " + Convert.ToString(Cifrado));
-                //rtGenerico.Text = System.Text.Encoding.Default.GetString(Cifrado);
+                rtDown.Text = System.Text.Encoding.Default.GetString(Cifrado);
 
-                byte[] Respuesta = AES_Class.decrypt(Cifrado, Encoding.ASCII.GetBytes(key));
-                rtGenerico.Text = System.Text.Encoding.Default.GetString(Respuesta);
+           
             }
             catch (Exception ex)
             {
@@ -41,6 +43,16 @@ namespace AES
         }
 
         private void btnDescifrar_Click(object sender, EventArgs e)
+        {
+            String textoCifrado = rtUp.Text;
+            String key = tbKey.Text;
+
+            byte[] Respuesta = AES_Class.decrypt(Encoding.ASCII.GetBytes(textoCifrado), Encoding.ASCII.GetBytes(key));
+            rtDown.Text = System.Text.Encoding.Default.GetString(Respuesta);
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
         {
 
         }
