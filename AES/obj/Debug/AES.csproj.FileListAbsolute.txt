@@ -12,3 +12,12 @@ C:\Users\drodriguez\Documents\GitHub\AES\AES\bin\Debug\AES.exe
 C:\Users\drodriguez\Documents\GitHub\AES\AES\bin\Debug\AES.pdb
 C:\Users\drodriguez\Documents\GitHub\AES\AES\obj\Debug\AES.exe
 C:\Users\drodriguez\Documents\GitHub\AES\AES\obj\Debug\AES.pdb
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\bin\Debug\AES.exe.config
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.exe
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.pdb
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\bin\Debug\AES.exe
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\bin\Debug\AES.pdb
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.csprojResolveAssemblyReference.cache
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.Form1.resources
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.Properties.Resources.resources
+C:\Users\Luigi\Desktop\Foto Luigy - Angelo\AES-master7\AES-master\AES\obj\Debug\AES.csproj.GenerateResource.Cache
