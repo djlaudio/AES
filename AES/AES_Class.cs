@@ -10,16 +10,9 @@ namespace AES
     {
 
          private static int Nb, Nk, Nr;
-         private static byte[,] w; //memorizza le subKeys
+         private static byte[,] w; //Arreglo de subKeys
  
-/*
- * La S-box utilizzata è derivata da una funzione inversa nel campo finito GF(2^8),
- * conosciuta per avere delle ottime proprietà di non linearità.
- * Per evitare un potenziale attacco basato sulle proprietà algebriche la S-box
- * è costruita combinando la funzione inversa con una trasformazione affine invertibile.
- * La S-box è stata scelta con cura per non possedere né punti fissi né punti fissi opposti.
- * La S-box utilizzata in questo algoritmo è liberamente disponibile sul web.
- */
+
          private static int[] sbox = { 0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F,
          0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76, 0xCA, 0x82,
          0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C,
@@ -45,10 +38,7 @@ namespace AES
          0x28, 0xDF, 0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41,
          0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16 };
  
-/*
- *
- * S-box per il decrypt
- */
+
          private static int[] inv_sbox = { 0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5,
          0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB, 0x7C, 0xE3,
          0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4,
@@ -74,9 +64,7 @@ namespace AES
          0x99, 0x61, 0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1,
          0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D };
  
-/*
- * Questa S-box viene utilizzata per generare le sub-keys dei vari passaggi dell'aes
- */
+
          private static int[] Rcon = { 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
          0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
          0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a,
@@ -94,7 +82,6 @@ namespace AES
          0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
          0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb };
  
-// Metodo che calcola lo xor tra array di byte, utilizzata nel metodo per generare le subKeys
  private static byte[] xor_func(byte[] a, byte[] b) {
     byte[] outt = new byte[a.Length];
     for (int i = 0; i < a.Length; i++) {
@@ -103,7 +90,6 @@ namespace AES
     return outt;
  
 }
- // Genero le varie subkeys di ogni round.
  private static byte[,] generateSubkeys(byte[] key) {
                  
                  byte[,] tmp = new byte[Nb * (Nr + 1), 4];
@@ -131,7 +117,6 @@ namespace AES
                         temp = SubWord(temp);
                      }
                      //añadir indice 0 temp para probar
-                     //tmp[i] = xor_func(tmp[i - Nk], temp);
 
                      tmp[i, 0] = (byte)((int)tmp[i - Nk, 0] ^ (int)temp[0]);
                      tmp[i, 1] = (byte)((int)tmp[i - Nk, 1] ^ (int)temp[1]);
@@ -144,9 +129,7 @@ namespace AES
                 return tmp;
  }
  
-/*
- * effettua una sostituzione di byte per ogni byte della parola in ingresso utilizzando la S-box
- */
+
  private static byte[] SubWord(byte[] inn) {
              byte[] tmp = new byte[inn.Length];
  
@@ -156,9 +139,7 @@ namespace AES
             return tmp;
  }
  
-/* esegue uno shift circolare di byte a sinistra su una parola. Per esempio:
- * rotateWord[b0,b1,b2,b3] = [b1,b2,b3,b0]
- */
+
  private static byte[] rotateWord(byte[] input) {
              byte[] tmp = new byte[input.Length];
              tmp[0] = input[1];
@@ -169,49 +150,30 @@ namespace AES
             return tmp;
  }
  
-/*
- * Il passaggio AddRoundKey combina con uno XOR la chiave di sessione con la matrice ottenuta
- * dai passaggi precedenti (State). Una chiave di sessione viene ricavata dalla chiave primaria
- * ad ogni round, attraverso il gestore delle chiavi.
- * Un AddRoundKey viene eseguito all'inizio di tutto.
- */
+
  private static byte[,] AddRoundKey(byte[,] state, byte[,] w, int round) {
  
-            //byte[,] tmp = new byte[state.Length, state.GetLength(0)];
  
             for (int c = 0; c < Nb; c++) {
                 for (int l = 0; l < 4; l++)
-                    //tmp.SetValue((byte)((byte) state.GetValue(l) ^ w[round * Nb + c, l]), l);
-                    //tmp[c,l] = (byte) ((int)state[c,l] ^ (int) w[round * Nb + l, c]);
                      state[c, l] = (byte)((int)state[c, l] ^ (int)w[round * Nb + l, c]); 
              }
  
             return state;
  }
  
-/*
- * Nel passaggio SubBytes ogni byte della matrice viene modificato tramite la S-box a 8 bit.
- * Questa operazione provvede a fornire la non linearità all'algoritmo.
- * La S-box utilizzata è derivata da una funzione inversa nel campo finito GF(2^8),
- * conosciuta per avere delle ottime proprietà di non linearità.
- *
- */
+
  private static byte[,] SubBytes(byte[,] state) {
  
-             //byte[,] tmp = new byte[state.Length, state.GetLength(0)];
 
              for (int row = 0; row < 4; row++)
                  for (int col = 0; col < Nb; col++)
-                    //tmp[row, col] = (byte) (sbox[(state[row, col] & 0x000000ff)] & 0xff);
                      state[row, col] = (byte)(sbox[(state[row, col] & 0x000000ff)] & 0xff);
  
              return state;
  }
  
- /*
- * Nel passaggio SubBytes ogni byte della matrice viene modificato tramite la S-box a 8 bit.
- * Effettua il passaggio contrario a SubBytes, ricavando gli states dalla matrice inversa.
- */
+
  private static byte[,] InvSubBytes(byte[,] state) {
 
              for (int row = 0; row < 4; row++)
@@ -221,20 +183,12 @@ namespace AES
              return state;
  }
  
-/* Il passaggio ShiftRows provvede a scostare le righe della matrice
- * di un parametro dipendente dal numero di riga. Nell'AES la prima riga
- * resta invariata, la seconda viene spostata di un posto verso sinistra,
- * la terza di due posti e la quarta di tre. In questo modo l'ultima colonna dei
- * dati in ingresso andrà a formare la diagonale della matrice in uscita.
- * Tutte le operazioni sono effettuate utilizzando l'indice della colonna “modulo”
- * il numero di colonne.
- */
+
  private static byte[,] ShiftRows(byte[,] state) {
  
                  byte[,] temp = new byte[4,4];
                  for (int r = 0; r < 4; r++) {
                      for (int c = 0; c < Nb; c++)
-                         //se añade sub c
                         temp[r, c] = state[r, c];
                  }
                  for (int r = 1; r < 4; r++)
@@ -246,9 +200,7 @@ namespace AES
                 return state;
  }
  
- /*
- * Il passaggio contrario a ShiftRows per il decrypt.
- */
+
  private static byte[,] InvShiftRows(byte[,] state) {
                  byte[,] temp = new byte[4,4];
 
@@ -264,20 +216,9 @@ namespace AES
                  return state;
  }
  
-//Il contrario di MixColumns, serve per decriptare.
  private static byte[,] InvMixColumns(byte[,] s){
-             //int[] sp = new int[4];
-             //byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
-             //for (int c = 0; c < 4; c++) {
-             //    sp[0] = FFMul(b02, (byte) s.GetValue(0)) ^ FFMul(b03, (byte) s.GetValue(1)) ^ FFMul(b04, (byte) s.GetValue(2)) ^ FFMul(b05, (byte) s.GetValue(3));
-             //    sp[1] = FFMul(b05, (byte)s.GetValue(0)) ^ FFMul(b02, (byte)s.GetValue(1)) ^ FFMul(b03, (byte)s.GetValue(2)) ^ FFMul(b04, (byte) s.GetValue(3));
-             //    sp[2] = FFMul(b04, (byte)s.GetValue(0)) ^ FFMul(b05, (byte)s.GetValue(1)) ^ FFMul(b02, (byte)s.GetValue(2)) ^ FFMul(b03, (byte) s.GetValue(3));
-             //    sp[3] = FFMul(b03, (byte)s.GetValue(0)) ^ FFMul(b04, (byte)s.GetValue(1)) ^ FFMul(b05, (byte)s.GetValue(2)) ^ FFMul(b02, (byte) s.GetValue(3));
-             //    for (int i = 0; i < 4; i++) 
-             //        s.SetValue((byte)(sp[i]), i);
-             //}
+
              
-             //return s;
              byte[,] temp = new byte[4, 4];
              byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
 
@@ -298,16 +239,9 @@ namespace AES
 
              }
 
-             //sp.CopyTo(s, 0);
              return s;
  }
  
- /*
- * Il passaggio MixColumns prende i quattro byte di ogni colonna e li combina
- * utilizzando una trasformazione lineare invertibile
- * Nel passaggio MixColumns ogni colonna di byte viene moltiplicata
- * per un polinomio fisso c(x).
- */
  private static byte[,] MixColumns(byte[,] s){
 
                  byte[,] temp = new byte[4, 4];
@@ -329,11 +263,10 @@ namespace AES
                      s[3, c] = (byte) (FFMul(b03, temp[0, c]) ^ temp[1, c] ^ temp[2, c] ^ FFMul(b02, temp[3, c]));
 
                  }
-                 //sp.CopyTo(s, 0);
-                 return s;
+                 
+     return s;
  }
- //Con questa funzione i byte "a" e "b" si moltiplicano lentamente utilizzando gli shift
- //Utilizzata in MixColumns
+ 
  public static byte FFMul(byte a, byte b) {
              byte aa = a, bb = b, r = 0, t;
              while (aa != 0) {
@@ -348,7 +281,7 @@ namespace AES
              return r;
  }
  
-//Per cifrare ogni blocco di 128 bit viene utilizzata questa funzione.
+
  public static byte[] encryptBloc(byte[] inn) {
              byte[] tmp = new byte[inn.Length];
  
@@ -375,7 +308,7 @@ namespace AES
             return tmp;
  }
  
-//Per decrifrare ogni blocco di 128 bit viene utilizzata questa funzione
+
  public static byte[] decryptBloc(byte[] inn) {
 
                 byte[] tmp = new byte[inn.Length];
@@ -404,9 +337,7 @@ namespace AES
                 return tmp;
  }
  
- /*Questa funzione che viene richiamata all'interno del main, provvede a criptare la stringa
- * di byte in ingresso, richiamando encryptBloc
- */
+
  public static byte[] encrypt(byte[] inn, byte[] key){
  
          Nb = 4;
@@ -454,9 +385,7 @@ namespace AES
          return tmp;
  }
  
- /*Questa funzione che viene richiamata all'interno del main, provvede a decriptare la stringa
- * di byte in ingresso, richiamando dencryptBloc
- */
+ 
  public static byte[] decrypt(byte[] inn,byte[] key){
              int i;
              byte[] tmp = new byte[inn.Length];
@@ -483,11 +412,7 @@ namespace AES
             return tmp;
  }
  
- /*
- * Elimina il padding inserito nell'elaborazione della stringa iniziale,
- * e viene utilizzato solo nel momento del decrypt del testo cifrato, per tornare al testo
- * iniziale.
- */
+ 
  private static byte[] deletePadding(byte[] input) {
              int count = 0;
  
